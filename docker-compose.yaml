@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  prometheus:
+    container_name: alassaf-if-netology-prometheus
+    image: prom/prometheus:latest
+    ports:
+        - "9090:9090"
+    volumes:
+        - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml
+        - prometheus_data:/prometheus
+    networks: 
+      - alassaf-if-my-netology-hw
+    depends_on:
+      - pushgateway
+      - alertmanager
+    restart: unless-stopped
+
+  alertmanager:
+    container_name: alassaf-if-netology-alertmanager
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - alassaf-if-my-netology-hw
+    restart: unless-stopped
+
+  pushgateway:
+    container_name: alassaf-if-netology-pushgateway
+    image: prom/pushgateway:latest
+    ports:
+        - "9091:9091"
+    networks: 
+      - alassaf-if-my-netology-hw
+    restart: unless-stopped
+
+  grafana:
+    container_name: alassaf-if-netology-grafana
+    image: grafana/grafana:latest
+    ports:
+      - "80:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/custom.ini:/etc/grafana/grafana.ini
+    environment:
+      - GF_PATHS_CONFIG=/etc/grafana/grafana.ini
+    networks: 
+      - alassaf-if-my-netology-hw
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  alassaf-if-my-netology-hw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
