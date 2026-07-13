@@ -26,7 +26,7 @@
 
 Просмотр содержимого файла:
 
-![task1-tail](images/img1.2.png)
+![task1-tail](images/img1.3.png)
 
 ---
 
